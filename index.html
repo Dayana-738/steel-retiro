@@ -30,7 +30,7 @@
     .hint-box svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; margin-top: 2px; }
     .hint-box p { font-size: 12.5px; color: var(--accent); line-height: 1.55; } .hint-box strong { font-weight: 600; }
     label { font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 6px; }
-    input[type=text], input[type=password], input[type=number] { width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 15px; font-family: inherit; color: var(--text-primary); background: var(--surface); outline: none; transition: border-color 0.15s; }
+    input[type=text], input[type=password], input[type=number] { width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 15px; font-family: inherit; color: var(--text-primary); background: var(--surface); outline: none; transition: border-color 0.15s; margin-bottom: 0; }
     input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(29,111,184,0.12); }
     .msg-err { font-size: 12.5px; color: var(--danger); margin-top: 6px; display: none; }
     button.primary { width: 100%; padding: 11px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }
@@ -74,6 +74,7 @@
     .loading { text-align: center; color: var(--text-hint); font-size: 13px; padding: 1rem 0; }
     .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
     .admin-header h2 { font-size: 15px; font-weight: 600; } .admin-header p { font-size: 12px; color: var(--text-secondary); }
+    .field-gap { margin-top: 12px; }
     footer { margin-top: 2.5rem; font-size: 11px; color: var(--text-hint); text-align: center; }
   </style>
 </head>
@@ -90,7 +91,7 @@
     <div id="screen-client" class="screen active">
       <div id="client-form">
         <div class="card">
-          <div class="step-label">Paso 1 — Número de pedido</div>
+          <div class="step-label">Paso 1 — Datos del pedido</div>
           <div class="hint-box">
             <svg viewBox="0 0 24 24"><path d="M3 9h18M3 15h18M8 3v18M16 3v18M3 3h18v18H3z"/></svg>
             <p>Ingresá el número que aparece al <strong>final de tu factura, junto al código de barras</strong>.</p>
@@ -98,6 +99,15 @@
           <label for="comp-input">Número de pedido</label>
           <input type="text" id="comp-input" placeholder="Ej: 123456" inputmode="numeric" autocomplete="off" />
           <p class="msg-err" id="err-comp">Ingresá el número de pedido.</p>
+          <div class="field-gap">
+            <label for="facturado-input">Facturado a</label>
+            <input type="text" id="facturado-input" placeholder="Nombre en la factura" autocomplete="off" />
+            <p class="msg-err" id="err-facturado">Ingresá el nombre en la factura.</p>
+          </div>
+          <div class="field-gap">
+            <label for="retira-input">Retirado por</label>
+            <input type="text" id="retira-input" placeholder="Nombre de quien viene a retirar (opcional)" autocomplete="off" />
+          </div>
         </div>
         <div class="card">
           <div class="step-label">Paso 2 — Elegí el día</div>
@@ -105,9 +115,9 @@
           <p class="msg-err" id="err-dia">Seleccioná un día para continuar.</p>
         </div>
         <div class="card card-disabled" id="card-turnos">
-          <div class="step-label">Paso 3 — Elegí el horario</div>
+          <div class="step-label">Paso 3 — Elegí la franja horaria de retiro</div>
           <div class="turnos-grid" id="turnos-grid"></div>
-          <p class="msg-err" id="err-turno">Seleccioná un turno disponible.</p>
+          <p class="msg-err" id="err-turno">Seleccioná una franja horaria disponible.</p>
         </div>
         <button class="primary" onclick="confirmarTurno()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -115,6 +125,7 @@
         </button>
         <div class="mt2 center"><span class="small-link" onclick="showAdmin()">Acceso administración →</span></div>
       </div>
+
       <div id="client-result" style="display:none;">
         <div class="result-card">
           <div style="font-size:13px;color:var(--success);">Tu turno de retiro</div>
@@ -123,11 +134,13 @@
           <div class="res-tip" id="res-tip"></div>
         </div>
         <div class="card">
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Pedido n.º <strong id="res-comp" style="color:var(--text-primary);"></strong></div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">Pedido n.º <strong id="res-comp" style="color:var(--text-primary);"></strong></div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">Facturado a: <strong id="res-facturado" style="color:var(--text-primary);"></strong></div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Retira: <strong id="res-retira" style="color:var(--text-primary);"></strong></div>
           <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Tu pedido estará listo al final del turno. Pasá a retirarlo por local.</div>
           <button class="wsp-btn" onclick="compartirWsp()">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-            Compartir turno por WhatsApp
+            Enviar turno por WhatsApp
           </button>
           <div class="mt1 center"><span class="small-link" onclick="resetCliente()">Registrar otro pedido</span></div>
         </div>
@@ -172,8 +185,17 @@
       </div>
       <div id="tab-config" style="display:none;">
         <div class="card">
-          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">Límite de pedidos por turno</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">Límite de pedidos por franja</div>
           <div id="slots-config"></div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">Número de WhatsApp para notificaciones</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Código de país + número, sin espacios ni +. Ej: 5492664123456</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="wsp-number-input" placeholder="5492664123456" />
+            <button class="secondary" onclick="guardarWspNumber()">Guardar</button>
+          </div>
+          <p id="wsp-number-ok" style="font-size:12.5px;margin-top:6px;display:none;color:var(--success);">✓ Número actualizado.</p>
         </div>
         <div class="card">
           <div style="font-size:14px;font-weight:600;margin-bottom:12px;">Feriados</div>
@@ -222,6 +244,7 @@
   ];
   const DIAS_CORTOS = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const BLOQUEO_ANTICIPADO = 2 * 60; // 2 horas en minutos
 
   function pad(n){ return String(n).padStart(2,'0'); }
   function dateStr(d){ return d.toISOString().slice(0,10); }
@@ -239,17 +262,29 @@
   async function getFeriados(){ const f=await fbGet('config/feriados'); return f?Object.values(f):[]; }
   async function getTurnosDelDia(dia){ const t=await fbGet('turnos/'+dia); return t?Object.values(t):[]; }
   async function getPass(){ const p=await fbGet('config/pass'); return p||'admin123'; }
+  async function getWspNumber(){ const n=await fbGet('config/wspNumber'); return n||''; }
 
-  // Regla: el turno 8:30 del día siguiente se bloquea a las 17:00 del día anterior
+  // Turno bloqueado si: ya empezó, o faltan menos de 2hs para que empiece, o es el primer turno y son >= 17hs del día anterior
   function turnoEsBloqueado(ds, turnoIdx){
-    if(turnoIdx !== 0) return false;
     const now = new Date();
     const hoy = dateStr(now);
-    const dTarget = new Date(ds+'T12:00:00');
-    const dAnterior = new Date(dTarget);
-    dAnterior.setDate(dAnterior.getDate()-1);
-    const dsAnterior = dateStr(dAnterior);
-    return hoy === dsAnterior && now.getHours() >= 17;
+    const ahora = now.getHours()*60 + now.getMinutes();
+    const t = TURNOS_DEF[turnoIdx];
+
+    if(ds === hoy){
+      // bloquear si ya empezó o si faltan menos de 2hs para que empiece
+      return ahora >= (t.inicio - BLOQUEO_ANTICIPADO);
+    }
+
+    // para días futuros: bloquear primer turno si hoy es el día anterior y son >= 17hs
+    if(turnoIdx === 0){
+      const dTarget = new Date(ds+'T12:00:00');
+      const dAnterior = new Date(dTarget);
+      dAnterior.setDate(dAnterior.getDate()-1);
+      const dsAnterior = dateStr(dAnterior);
+      if(hoy === dsAnterior && ahora >= 17*60) return true;
+    }
+    return false;
   }
 
   function esHabil(ds, feriados){
@@ -300,20 +335,16 @@
 
   async function buildTurnos(ds){
     const grid=document.getElementById('turnos-grid');
-    grid.innerHTML='<div class="loading">Cargando turnos...</div>';
+    grid.innerHTML='<div class="loading">Cargando franjas...</div>';
     const config=await getConfig();
     const todos=await getTurnosDelDia(ds);
-    const hoy=dateStr(new Date());
-    const ahora=new Date().getHours()*60+new Date().getMinutes();
     grid.innerHTML=TURNOS_DEF.map((t,i)=>{
       const ocupados=todos.filter(x=>x.turnoIdx===i).length;
       const lleno=ocupados>=config[i];
-      const pasado=ds===hoy && t.inicio<=ahora;
       const bloqueado=turnoEsBloqueado(ds,i);
-      const noDisp=lleno||pasado||bloqueado;
+      const noDisp=lleno||bloqueado;
       let capTxt='';
       if(lleno) capTxt='Completo';
-      else if(pasado) capTxt='Turno pasado';
       else if(bloqueado) capTxt='No disponible';
       return `<div class="turno-btn${noDisp?' lleno':''}" onclick="window._selTurno(${i},this)">
         <div class="turno-hora">${t.label}</div>
@@ -331,38 +362,53 @@
 
   async function confirmarTurno(){
     const comp=document.getElementById('comp-input').value.trim();
+    const facturado=document.getElementById('facturado-input').value.trim();
+    const retira=document.getElementById('retira-input').value.trim();
     let ok=true;
-    ['err-comp','err-dia','err-turno'].forEach(id=>document.getElementById(id).style.display='none');
+    ['err-comp','err-facturado','err-dia','err-turno'].forEach(id=>document.getElementById(id).style.display='none');
     if(!comp){ document.getElementById('err-comp').style.display='block'; ok=false; }
+    if(!facturado){ document.getElementById('err-facturado').style.display='block'; ok=false; }
     if(!selDia){ document.getElementById('err-dia').style.display='block'; ok=false; }
     if(selTurno===null){ document.getElementById('err-turno').style.display='block'; ok=false; }
     if(!ok) return;
+
     const turnosRef=ref(db,'turnos/'+selDia);
     const snap=await get(turnosRef);
     const existing=snap.exists()?Object.values(snap.val()):[];
     if(!existing.find(x=>x.comp===comp && x.turnoIdx===selTurno)){
-      await push(turnosRef,{ comp, turnoIdx:selTurno, ts:new Date().toISOString() });
+      await push(turnosRef,{ comp, facturado, retira, turnoIdx:selTurno, ts:new Date().toISOString() });
     }
+
     const t=TURNOS_DEF[selTurno];
     const finH=Math.floor(t.fin/60), finM=t.fin%60;
     document.getElementById('res-hora').textContent=t.label;
     document.getElementById('res-dia').textContent=formatFechaLarga(selDia);
     document.getElementById('res-comp').textContent=comp;
+    document.getElementById('res-facturado').textContent=facturado;
+    document.getElementById('res-retira').textContent=retira||'—';
     document.getElementById('res-tip').textContent=`Pasá a buscarlo cerca de las ${pad(finH)}:${pad(finM)} hs.`;
-    window._ta={ comp, dia:selDia, turnoLabel:t.label, hora:`${pad(finH)}:${pad(finM)}` };
+    window._ta={ comp, facturado, retira, dia:selDia, turnoLabel:t.label, hora:`${pad(finH)}:${pad(finM)}` };
+
     document.getElementById('client-form').style.display='none';
     document.getElementById('client-result').style.display='block';
   }
 
-  function compartirWsp(){
+  async function compartirWsp(){
     const d=window._ta; if(!d) return;
-    const txt=`✅ *Steel SRL – Retiro de mercadería*\n\nPedido n.º: *${d.comp}*\nDía: ${formatFechaLarga(d.dia)}\nHorario: *${d.turnoLabel}*\n\nPasá a buscar tu pedido cerca de las ${d.hora} hs.\n📍 Retiro por local.`;
-    window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+    const wspNum = await getWspNumber();
+    const retiraStr = d.retira ? `\nRetirado por: *${d.retira}*` : '';
+    const txt=`✅ *Steel SRL – Retiro de mercadería*\n\nPedido n.º: *${d.comp}*\nFacturado a: *${d.facturado}*${retiraStr}\nDía: ${formatFechaLarga(d.dia)}\nFranja horaria: *${d.turnoLabel}*\n\nPasá a buscar tu pedido cerca de las ${d.hora} hs.\n📍 Retiro por local.\n\n🔧 *Recordá:* si tenés material de ferretería, pasá por el local de la esquina.`;
+    const url = wspNum
+      ? `https://wa.me/${wspNum}?text=${encodeURIComponent(txt)}`
+      : `https://wa.me/?text=${encodeURIComponent(txt)}`;
+    window.open(url,'_blank');
   }
 
   async function resetCliente(){
     selDia=null; selTurno=null;
     document.getElementById('comp-input').value='';
+    document.getElementById('facturado-input').value='';
+    document.getElementById('retira-input').value='';
     document.getElementById('client-form').style.display='block';
     document.getElementById('client-result').style.display='none';
     document.getElementById('card-turnos').classList.add('card-disabled');
@@ -374,6 +420,8 @@
     const now=new Date();
     document.getElementById('admin-fecha').textContent=formatFechaLarga(dateStr(now))+' – '+pad(now.getHours())+':'+pad(now.getMinutes())+' hs';
     renderTurnos(); renderConfig(); renderFeriados();
+    const wspNum=await getWspNumber();
+    document.getElementById('wsp-number-input').value=wspNum;
   }
 
   function switchTab(tabId,el){
@@ -394,12 +442,14 @@
       const todos=snap.exists()?Object.values(snap.val()):[];
       const fil=filtro==='all'?todos:todos.filter(x=>String(x.turnoIdx)===filtro);
       if(fil.length===0){ cont.innerHTML='<div class="empty">Sin turnos registrados hoy.</div>'; return; }
-      // ordenar por turno
       fil.sort((a,b)=>a.turnoIdx-b.turnoIdx);
       cont.innerHTML=fil.map(x=>{
         const t=TURNOS_DEF[x.turnoIdx];
         return `<div class="turno-row">
-          <div><div style="font-weight:500;">Pedido ${x.comp}</div><div style="color:var(--text-secondary);font-size:12px;">${t.label}</div></div>
+          <div>
+            <div style="font-weight:500;">${x.facturado||'—'}</div>
+            <div style="color:var(--text-secondary);font-size:12px;">Pedido ${x.comp}${x.retira?' · Retira: '+x.retira:''} · ${t.label}</div>
+          </div>
           <span class="badge">${t.label.split('–')[1].trim()}</span>
         </div>`;
       }).join('');
@@ -460,12 +510,21 @@
     el.textContent='✓ Contraseña actualizada.'; el.style.color='var(--success)'; el.style.display='block';
   };
 
-  // Exponer funciones al HTML
+  window._guardarWspNumber=async function(){
+    const val=document.getElementById('wsp-number-input').value.trim();
+    await fbSet('config/wspNumber', val);
+    const el=document.getElementById('wsp-number-ok');
+    el.style.display='block';
+    setTimeout(()=>el.style.display='none', 3000);
+  };
+
+  // Exponer al HTML
   window.showScreen=showScreen; window.showAdmin=showAdmin; window.doLogin=doLogin; window.doLogout=doLogout;
   window.confirmarTurno=confirmarTurno; window.compartirWsp=compartirWsp; window.resetCliente=resetCliente;
   window.switchTab=switchTab; window.renderTurnos=renderTurnos;
   window.agregarFeriado=window._agregarFeriado; window.quitarFeriado=window._quitarFeriado;
   window.limpiarTurnos=window._limpiarTurnos; window.cambiarPass=window._cambiarPass;
+  window.guardarWspNumber=window._guardarWspNumber;
 
   buildDias();
 </script>
