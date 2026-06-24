@@ -98,6 +98,21 @@
     .hist-row:last-child { border-bottom: none; }
     footer { margin-top: 2.5rem; font-size: 11px; color: var(--text-hint); text-align: center; }
 
+    /* Pantalla Ventas */
+    .ventas-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .ventas-header h2 { font-size: 15px; font-weight: 600; }
+    .ventas-header p { font-size: 12px; color: var(--text-secondary); }
+    .ferreteria-card { background: var(--warning-light); border: 2px solid var(--warning-border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 0.75rem; box-shadow: var(--shadow); }
+    .ferreteria-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--warning-border); font-size: 13px; }
+    .ferreteria-row:last-child { border-bottom: none; }
+    .btn-preparado { background: var(--success); color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .btn-preparado.hecho { background: var(--success-light); color: var(--success); border: 1px solid var(--success-border); cursor: default; }
+
+    /* Checkbox ferretería en admin */
+    .check-ferreteria { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--warning-text); background: var(--warning-light); border: 1px solid var(--warning-border); border-radius: 6px; padding: 4px 8px; cursor: pointer; user-select: none; white-space: nowrap; flex-shrink: 0; }
+    .check-ferreteria input { accent-color: var(--warning-text); width: 13px; height: 13px; cursor: pointer; }
+    .check-ferreteria.marcado { background: #fff3cd; font-weight: 600; }
+
     /* Botón avisar pedido listo */
     .btn-avisar {
       display: inline-flex; align-items: center; gap: 5px;
@@ -134,7 +149,7 @@
             <p>Ingresá el número que aparece al <strong>final de tu factura, junto al código de barras</strong>.</p>
           </div>
           <div id="comprobantes-lista"></div>
-          <button type="button" onclick="agregarComprobante()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:13px;font-family:inherit;cursor:pointer;">+ Agregar otro comprobante</button>
+          <button type="button" onclick="window.agregarComprobante()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:13px;font-family:inherit;cursor:pointer;">+ Agregar otro comprobante</button>
           <p class="msg-err" id="err-comp">Completá al menos un comprobante con número y nombre.</p>
         </div>
 
@@ -155,11 +170,12 @@
           <div class="turnos-grid" id="turnos-grid"></div>
           <p class="msg-err" id="err-turno">Seleccioná una franja horaria disponible.</p>
         </div>
-        <button class="primary" onclick="confirmarTurno()">
+        <button class="primary" onclick="window.confirmarTurno()">  
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           Confirmar turno
         </button>
-        <div class="mt2 center"><span class="small-link" onclick="showAdmin()">Acceso administración →</span></div>
+        <div class="mt2 center"><span class="small-link" onclick="window.showAdmin()">  Acceso administración →</span></div>
+        <div class="mt1 center"><span class="small-link" onclick="window.showScreen('screen-ventas')">Acceso ventas →</span></div>
       </div>
 
       <div id="client-result" style="display:none;">
@@ -172,11 +188,11 @@
         <div class="card">
           <div id="res-comprobantes" style="margin-bottom:10px;"></div>
           <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Tu pedido estará listo al final del turno. Pasá a retirarlo por el galpón, 25 de Mayo 2024.</div>
-          <button class="wsp-btn" onclick="compartirWsp()">
+          <button class="wsp-btn" onclick="window.compartirWsp()">  
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
             Enviar turno por WhatsApp
           </button>
-          <div class="mt1 center"><span class="small-link" onclick="resetCliente()">Registrar otro pedido</span></div>
+          <div class="mt1 center"><span class="small-link" onclick="window.resetCliente()">  Registrar otro pedido</span></div>
         </div>
       </div>
     </div>
@@ -188,8 +204,8 @@
         <label>Contraseña</label>
         <input type="password" id="pass-input" placeholder="••••••••" />
         <p class="msg-err" id="err-pass">Contraseña incorrecta.</p>
-        <button class="primary" style="margin-top:12px;" onclick="doLogin()">Ingresar</button>
-        <div class="mt1 center"><span class="small-link" onclick="showScreen('screen-client')">← Volver al inicio</span></div>
+        <button class="primary" style="margin-top:12px;" onclick="window.doLogin()">  Ingresar</button>
+        <div class="mt1 center"><span class="small-link" onclick="window.showScreen('screen-client')">← Volver al inicio</span></div>
       </div>
     </div>
 
@@ -197,12 +213,12 @@
     <div id="screen-admin" class="screen">
       <div class="admin-header">
         <div><h2>Panel de administración</h2><p id="admin-fecha">—</p></div>
-        <button class="secondary" onclick="doLogout()">Salir</button>
+        <button class="secondary" onclick="window.doLogout()">  Salir</button>
       </div>
       <div class="nav-tabs">
-        <button class="tab active" onclick="switchTab('tab-turnos',this)">Turnos</button>
-        <button class="tab" onclick="switchTab('tab-historial',this)">Historial</button>
-        <button class="tab" onclick="switchTab('tab-config',this)">Configuración</button>
+        <button class="tab active" onclick="window.switchTab('tab-turnos',this)">Turnos</button>
+        <button class="tab" onclick="window.switchTab('tab-historial',this)">Historial</button>
+        <button class="tab" onclick="window.switchTab('tab-config',this)">Configuración</button>
       </div>
 
       <div id="tab-turnos">
@@ -217,7 +233,7 @@
           </select>
         </div>
         <div id="lista-turnos"><div class="loading">Cargando...</div></div>
-        <button class="danger-btn" style="margin-top:0.5rem;" onclick="pedirLimpiar()">Limpiar turnos de hoy</button>
+        <button class="danger-btn" style="margin-top:0.5rem;" onclick="window.pedirLimpiar()">  Limpiar turnos de hoy</button>
       </div>
 
       <div id="tab-historial" style="display:none;">
@@ -239,7 +255,7 @@
           <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Código de país + número sin espacios. Ej: 5492664123456</div>
           <div style="display:flex;gap:8px;">
             <input type="text" id="wsp-number-input" placeholder="5492664123456" />
-            <button class="secondary" onclick="guardarWspNumber()">Guardar</button>
+            <button class="secondary" onclick="window.guardarWspNumber()">  Guardar</button>
           </div>
           <p id="wsp-ok" style="font-size:12px;color:var(--success);margin-top:6px;display:none;">✓ Guardado.</p>
         </div>
@@ -248,7 +264,7 @@
           <div id="feriados-lista"></div>
           <div style="display:flex;gap:8px;margin-top:12px;">
             <input type="text" id="nuevo-feriado" placeholder="YYYY-MM-DD" style="width:160px;" />
-            <button class="secondary" onclick="agregarFeriado()">+ Agregar</button>
+            <button class="secondary" onclick="window.agregarFeriado()">  + Agregar</button>
           </div>
           <p class="msg-err" id="err-feriado-admin">Formato inválido. Usá YYYY-MM-DD.</p>
         </div>
@@ -256,12 +272,21 @@
           <div style="font-size:14px;font-weight:600;margin-bottom:12px;">Contraseña de acceso</div>
           <div style="display:flex;gap:8px;">
             <input type="password" id="nueva-pass" placeholder="Nueva contraseña" />
-            <button class="secondary" onclick="cambiarPass()">Guardar</button>
+            <button class="secondary" onclick="window.cambiarPass()">  Guardar</button>
           </div>
           <p id="pass-ok" style="font-size:12px;margin-top:6px;display:none;"></p>
         </div>
       </div>
     </div>
+    <!-- VENTAS -->
+    <div id="screen-ventas" class="screen">
+      <div class="ventas-header">
+        <div><h2>🔧 Ventas — Ferretería</h2><p id="ventas-fecha">—</p></div>
+        <button class="secondary" onclick="window.showScreen('screen-client')">← Inicio</button>
+      </div>
+      <div id="lista-ferreteria"><div class="loading">Cargando...</div></div>
+    </div>
+
   </div>
 
   <!-- Modal entregar -->
@@ -277,8 +302,8 @@
         <p class="msg-err" id="err-hora-salida">Ingresá la hora en formato HH:MM.</p>
       </div>
       <div class="modal-btns">
-        <button class="secondary" onclick="cerrarModalEntregar()">Cancelar</button>
-        <button class="primary" style="width:auto;" onclick="confirmarEntrega()">Confirmar</button>
+        <button class="secondary" onclick="window.cerrarModalEntregar()">  Cancelar</button>
+        <button class="primary" style="width:auto;" onclick="window.confirmarEntrega()">  Confirmar</button>
       </div>
     </div>
   </div>
@@ -292,8 +317,8 @@
       <input type="password" id="pass-limpiar" placeholder="••••••••" />
       <p class="msg-err" id="err-limpiar">Contraseña incorrecta.</p>
       <div class="modal-btns">
-        <button class="secondary" onclick="cerrarModalLimpiar()">Cancelar</button>
-        <button style="flex:1;padding:11px;background:var(--danger);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;" onclick="confirmarLimpiar()">Sí, limpiar</button>
+        <button class="secondary" onclick="window.cerrarModalLimpiar()">  Cancelar</button>
+        <button style="flex:1;padding:11px;background:var(--danger);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;" onclick="window.confirmarLimpiar()">  Sí, limpiar</button>
       </div>
     </div>
   </div>
@@ -364,7 +389,11 @@
     return d.getDay()!==0 && d.getDay()!==6 && !feriados.includes(ds);
   }
 
-  function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id==='screen-ventas') initVentas();
+  }
   function showAdmin(){ showScreen('screen-login'); }
 
   async function doLogin(){
@@ -438,7 +467,7 @@
     div.className = 'comp-item';
     div.id = 'comp-item-'+idx;
     div.innerHTML = '<div class="comp-item-num"><span>Comprobante '+(idx+1)+'</span>'
-      +(idx>0?'<button class="comp-remove" onclick="quitarComp('+idx+')" title="Quitar">×</button>':'')
+      +(idx>0?'<button class="comp-remove" onclick="window.quitarComp('+idx+')" title="Quitar">×</button>':'')
       +'</div>'
       +'<label>Número de pedido</label>'
       +'<input type="text" class="input-comp" placeholder="Ej: 123456" inputmode="numeric" autocomplete="off" />'
@@ -532,6 +561,143 @@
     await buildDias();
   }
 
+  // ── FERRETERÍA ───────────────────────────────────────────────────────────────
+  window._toggleFerreteria = async function(key, dia, checked) {
+    await fbSet('turnos/'+dia+'/'+key+'/ferreteria', checked);
+    if(checked){
+      // Limpiar preparado si se re-activa
+      await fbSet('turnos/'+dia+'/'+key+'/ferreteriaPreparada', false);
+    }
+  };
+
+  window._marcarFerreteriaPreparada = async function(key, dia) {
+    const snap = await get(ref(db, 'turnos/'+dia+'/'+key));
+    if(!snap.exists()) return;
+    const x = snap.val();
+    const t = TURNOS_DEF[x.turnoIdx];
+    await fbSet('turnos/'+dia+'/'+key+'/ferreteriaPreparada', true);
+    await fbSet('turnos/'+dia+'/'+key+'/tsFerreteriaPreparada', new Date().toISOString());
+    // Guardar en historial de ferretería
+    const mes = dia.slice(0,7);
+    await push(ref(db,'historial/'+mes), {
+      comp: x.comp, facturado: x.facturado||'', retira: x.retira||'',
+      turnoLabel: t.label, dia,
+      horaEntrega: pad(new Date().getHours())+':'+pad(new Date().getMinutes()),
+      remito: '—', enHorario: false,
+      ferreteria: true, ts: new Date().toISOString()
+    });
+  };
+
+  let unsubVentas = null;
+  function initVentas(){
+    if(Notification.permission === 'default') Notification.requestPermission();
+    const now = new Date();
+    document.getElementById('ventas-fecha').textContent =
+      fechaLarga(hoy()) + ' – ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' hs';
+    suscribirVentas();
+  }
+
+  function playBeep(){
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.6);
+    } catch(e){}
+  }
+
+  function suscribirVentas(){
+    if(unsubVentas) unsubVentas();
+    const cont = document.getElementById('lista-ferreteria');
+    cont.innerHTML = '<div class="loading">Cargando...</div>';
+    let _prevKeys = null;
+    unsubVentas = onValue(ref(db,'turnos'), snap => {
+      if(!snap.exists()){ cont.innerHTML='<div class="empty">Sin pedidos con ferretería.</div>'; _prevKeys=new Set(); return; }
+      const hoyStr = hoy();
+      const pedidos = [];
+      snap.forEach(diaSnap => {
+        const dia = diaSnap.key;
+        if(dia < hoyStr) return;
+        Object.entries(diaSnap.val()).forEach(([k,v]) => {
+          if(v.ferreteria) pedidos.push({...v, _key:k, _dia:dia});
+        });
+      });
+
+      // Detectar nuevos pedidos con ferretería
+      const currentKeys = new Set(pedidos.map(p=>p._key));
+      if(_prevKeys !== null){
+        const nuevos = [...currentKeys].filter(k=>!_prevKeys.has(k));
+        if(nuevos.length > 0){
+          playBeep();
+          if(Notification.permission==='granted'){
+            new Notification('🔧 Steel — Ferretería', { body: 'Nuevo pedido con material de ferretería' });
+          }
+          // Parpadeo título
+          if(!window._blinkVentasInterval){
+            const orig = document.title;
+            let b = 0;
+            window._blinkVentasInterval = setInterval(()=>{
+              document.title = b%2===0 ? '🔧 Nuevo pedido!' : orig; b++;
+            }, 800);
+            const stop = ()=>{
+              if(window._blinkVentasInterval){ clearInterval(window._blinkVentasInterval); window._blinkVentasInterval=null; }
+              document.title = orig;
+              document.removeEventListener('visibilitychange', stop);
+              window.removeEventListener('focus', stop);
+            };
+            document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) stop(); });
+            window.addEventListener('focus', stop);
+          }
+        }
+      }
+      _prevKeys = currentKeys;
+
+      if(!pedidos.length){ cont.innerHTML='<div class="empty">Sin pedidos con ferretería.</div>'; return; }
+
+      // Separar pendientes y listos
+      const pendientes = pedidos.filter(p=>!p.ferreteriaPreparada);
+      const listos = pedidos.filter(p=>p.ferreteriaPreparada);
+
+      let html = '';
+      if(pendientes.length){
+        html += '<div class="ferreteria-card">'
+          +'<div style="font-size:12px;font-weight:600;color:var(--warning-text);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">⏳ Pendientes ('+pendientes.length+')</div>'
+          + pendientes.map(x => {
+            const t = TURNOS_DEF[x.turnoIdx];
+            return '<div class="ferreteria-row">'
+              +'<div style="flex:1;min-width:0;">'
+              +'<div style="font-weight:500;">'+(x.facturado||'—')+'</div>'
+              +'<div style="font-size:12px;color:var(--text-secondary);">Pedido '+x.comp+' · '+t.label+' · '+fechaLarga(x._dia)+'</div>'
+              +'</div>'
+              +'<button class="btn-preparado" onclick="window._marcarFerreteriaPreparada(\''+x._key+'\',\''+x._dia+'\')">⏳ Pendiente</button>'
+              +'</div>';
+          }).join('')
+          +'</div>';
+      }
+      if(listos.length){
+        html += '<div class="card">'
+          +'<div style="font-size:12px;font-weight:600;color:var(--success);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">✓ Listos para retirar ('+listos.length+')</div>'
+          + listos.map(x => {
+            const t = TURNOS_DEF[x.turnoIdx];
+            return '<div class="ferreteria-row" style="border-color:var(--border);">'
+              +'<div style="flex:1;min-width:0;">'
+              +'<div style="font-weight:500;">'+(x.facturado||'—')+'</div>'
+              +'<div style="font-size:12px;color:var(--text-secondary);">Pedido '+x.comp+' · '+t.label+'</div>'
+              +'</div>'
+              +'<span class="badge">✓ Listo</span>'
+              +'</div>';
+          }).join('')
+          +'</div>';
+      }
+      cont.innerHTML = html;
+    });
+  }
+  // ────────────────────────────────────────────────────────────────────────────
+
   // ── AVISAR PEDIDO LISTO POR WHATSAPP ────────────────────────────────────────
   const WSP_ICON = '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>';
 
@@ -544,12 +710,9 @@
 
     const t = TURNOS_DEF[x.turnoIdx];
     const msg =
-      '✅ *Steel SRL* — Tu pedido está listo para retirar.\n\n'
-      + '📦 Pedido N° *' + x.comp + '*\n'
-      + (x.facturado ? 'Facturado a: ' + x.facturado + '\n' : '')
-      + '\nPasá a buscarlo por el galpón (25 de Mayo 2024) '
-      + 'dentro de tu franja horaria: *' + t.label + '*.\n\n'
-      + '🔧 Si tenés material de ferretería, pasá por el local de la esquina.';
+      '✅ *Steel SRL* — Tu pedido ya está listo para retirar.\n'
+      + '📦 Pedido N° *' + x.comp + '* Facturado a: ' + (x.facturado || '') + '\n'
+      + 'Pasá a buscarlo por el galpón (25 de Mayo 2024).';
 
     // Registrar aviso en Firebase
     await fbSet('turnos/'+dia+'/'+key+'/avisado', true);
@@ -636,16 +799,29 @@
             const entregado=!!x.entregado;
             const avisado=!!x.avisado;
             const tieneTel=!!x.telefono;
+            const tieneF=!!x.ferreteria;
+            const ferrPrep=!!x.ferreteriaPreparada;
+
+            // Checkbox ferretería
+            const chkFerr = !entregado
+              ? '<label class="check-ferreteria'+(tieneF?' marcado':'')+'" onclick="event.stopPropagation()">'
+                +'<input type="checkbox" '+(tieneF?'checked':'')+' onchange="window._toggleFerreteria(\''+x._key+'\',\''+dia+'\',this.checked)" />'
+                +'🔧 Ferretería</label>'
+              : (tieneF ? '<span style="font-size:11px;color:var(--warning-text);">🔧 Ferretería</span>' : '');
 
             // Construir botón de aviso
+            // Si tiene ferretería marcada: solo habilitar cuando ventas lo marcó como preparado
             let btnAvisar = '';
             if(!entregado){
               if(avisado){
                 btnAvisar = '<button class="btn-avisar avisado" disabled>'
                   + WSP_ICON + ' Avisado</button>';
-              } else if(tieneTel){
+              } else if(tieneTel && (!tieneF || ferrPrep)){
                 btnAvisar = '<button class="btn-avisar" onclick="window._avisarPedidoListo(\''+x._key+'\',\''+dia+'\')">'
                   + WSP_ICON + ' Avisar listo</button>';
+              } else if(tieneTel && tieneF && !ferrPrep){
+                btnAvisar = '<button class="btn-avisar" disabled style="opacity:0.4;cursor:not-allowed;background:#aaa;">'
+                  + WSP_ICON + ' Espera ferretería</button>';
               }
             }
 
@@ -657,6 +833,7 @@
               +(entregado?'<div style="font-size:11px;color:var(--success);margin-top:2px;">✓ '+x.horaEntrega+' hs · Remito '+x.remito+'</div>':'')
               +'</div>'
               +'<div class="turno-acciones">'
+              + chkFerr
               + btnAvisar
               +(!entregado
                 ?'<button onclick="window._abrirEntrega(\''+x._key+'\',\''+dia+'\')" style="background:var(--accent);color:white;border:none;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap;">Entregar</button>'
@@ -741,8 +918,8 @@
     cont.innerHTML='<div class="card">'+items.map(x=>
       '<div class="hist-row"><div style="display:flex;justify-content:space-between;align-items:flex-start;">'
       +'<div><div style="font-weight:500;">'+(x.facturado||x.comp)+'</div>'
-      +'<div style="font-size:12px;color:var(--text-secondary);">Pedido '+x.comp+' · Remito '+x.remito+'</div>'
-      +'<div style="font-size:12px;color:var(--text-secondary);">'+x.dia+' · '+x.turnoLabel+'</div></div>'
+      +'<div style="font-size:12px;color:var(--text-secondary);">Pedido '+x.comp+' · '+(x.remito&&x.remito!=='—'?'Remito '+x.remito:'Sin remito')+'</div>'
+      +'<div style="font-size:12px;color:var(--text-secondary);">'+x.dia+' · '+x.turnoLabel+(x.ferreteria?' · 🔧 Ferretería':'')+'</div></div>'
       +'<div style="text-align:right;flex-shrink:0;margin-left:8px;">'
       +'<div style="font-size:13px;font-weight:500;">'+x.horaEntrega+' hs</div>'
       +'<div style="font-size:11px;color:'+(x.enHorario?'var(--success)':'var(--warning-text)')+';">'+(x.enHorario?'En horario':'Fuera horario')+'</div>'
@@ -798,6 +975,7 @@
   }
 
   window.showScreen=showScreen; window.showAdmin=showAdmin; window.doLogin=doLogin; window.doLogout=doLogout;
+  window.quitarComp=window.quitarComp||function(){}; // already set above via window.quitarComp=
   window.confirmarTurno=confirmarTurno; window.compartirWsp=compartirWsp; window.resetCliente=resetCliente;
   window.switchTab=switchTab; window.suscribirTurnos=suscribirTurnos;
   window.cerrarModalEntregar=cerrarModalEntregar; window.confirmarEntrega=confirmarEntrega;
