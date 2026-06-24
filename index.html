@@ -276,6 +276,11 @@
           </div>
           <p id="pass-ok" style="font-size:12px;margin-top:6px;display:none;"></p>
         </div>
+        <div class="card" style="border-color:#e8b0aa;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:var(--danger);">⚠️ Resetear todo el sistema</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Borra todos los turnos, historial y configuración. Requiere PIN.</div>
+          <button class="danger-btn" onclick="window.pedirResetTotal()">Resetear todo</button>
+        </div>
       </div>
     </div>
     <!-- VENTAS -->
@@ -283,6 +288,13 @@
       <div class="ventas-header">
         <div><h2>🔧 Ventas — Ferretería</h2><p id="ventas-fecha">—</p></div>
         <button class="secondary" onclick="window.showScreen('screen-client')">← Inicio</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+        <span style="font-size:13px;color:var(--text-secondary);">Día:</span>
+        <select id="filtro-ventas-dia" onchange="window.suscribirVentas()" style="font-size:13px;padding:5px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-primary);cursor:pointer;font-family:inherit;">
+          <option value="hoy">Hoy</option>
+          <option value="todos">Todos los días</option>
+        </select>
       </div>
       <div id="lista-ferreteria"><div class="loading">Cargando...</div></div>
     </div>
@@ -319,6 +331,21 @@
       <div class="modal-btns">
         <button class="secondary" onclick="window.cerrarModalLimpiar()">  Cancelar</button>
         <button style="flex:1;padding:11px;background:var(--danger);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;" onclick="window.confirmarLimpiar()">  Sí, limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal reset total -->
+  <div id="modal-reset" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-title">⚠️ Resetear todo el sistema</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Se borrarán <strong>todos los turnos, historial y configuración</strong>. Esta acción no se puede deshacer.</p>
+      <label>PIN de confirmación</label>
+      <input type="password" id="pin-reset" placeholder="••••" inputmode="numeric" maxlength="4" />
+      <p class="msg-err" id="err-reset">PIN incorrecto.</p>
+      <div class="modal-btns">
+        <button class="secondary" onclick="window.cerrarModalReset()">Cancelar</button>
+        <button style="flex:1;padding:11px;background:var(--danger);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;" onclick="window.confirmarResetTotal()">Sí, borrar todo</button>
       </div>
     </div>
   </div>
@@ -614,14 +641,16 @@
     if(unsubVentas) unsubVentas();
     const cont = document.getElementById('lista-ferreteria');
     cont.innerHTML = '<div class="loading">Cargando...</div>';
+    const filtro = document.getElementById('filtro-ventas-dia')?.value || 'hoy';
+    const hoyStr = hoy();
     let _prevKeys = null;
     unsubVentas = onValue(ref(db,'turnos'), snap => {
       if(!snap.exists()){ cont.innerHTML='<div class="empty">Sin pedidos con ferretería.</div>'; _prevKeys=new Set(); return; }
-      const hoyStr = hoy();
       const pedidos = [];
       snap.forEach(diaSnap => {
         const dia = diaSnap.key;
         if(dia < hoyStr) return;
+        if(filtro === 'hoy' && dia !== hoyStr) return;
         Object.entries(diaSnap.val()).forEach(([k,v]) => {
           if(v.ferreteria) pedidos.push({...v, _key:k, _dia:dia});
         });
@@ -973,6 +1002,23 @@
     document.getElementById('nueva-pass').value='';
     el.textContent='✓ Contraseña actualizada.'; el.style.color='var(--success)'; el.style.display='block';
   }
+
+  window.pedirResetTotal = function(){
+    document.getElementById('pin-reset').value='';
+    document.getElementById('err-reset').style.display='none';
+    document.getElementById('modal-reset').style.display='flex';
+  };
+  window.cerrarModalReset = function(){ document.getElementById('modal-reset').style.display='none'; };
+  window.confirmarResetTotal = async function(){
+    const pin = document.getElementById('pin-reset').value.trim();
+    if(pin !== '1998'){ document.getElementById('err-reset').style.display='block'; return; }
+    // Borrar todo
+    await fbRemove('turnos');
+    await fbRemove('historial');
+    await fbRemove('config');
+    window.cerrarModalReset();
+    alert('✓ Sistema reseteado correctamente.');
+  };
 
   window.showScreen=showScreen; window.showAdmin=showAdmin; window.doLogin=doLogin; window.doLogout=doLogout;
   window.quitarComp=window.quitarComp||function(){}; // already set above via window.quitarComp=
